@@ -11,6 +11,7 @@ map("n", "K",vim.lsp.buf.hover)
 map("n", "gd", vim.lsp.buf.definition)
 
 map("n", "ca", vim.lsp.buf.code_action)
+      vim.keymap.set('n', '<leader>r', require('telescope').extensions.flutter.commands, { desc = 'Open command Flutter' })
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
 -- vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
@@ -101,7 +102,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
-vim.keymap.set('n', '<leader>sn', function()
+local builtin = require 'telescope.builtin'
+vim.keymap.set('n', '<leader>fn', function()
   builtin.find_files { cwd = vim.fn.stdpath 'config' }
 end, { desc = '[S]earch [N]eovim files' })
 
