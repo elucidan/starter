@@ -13,7 +13,16 @@ return {
       'nvim-lua/plenary.nvim',
       'stevearc/dressing.nvim', -- optional for vim.ui.select
     },
-    config = true,
+    config = function()
+      local dap = require 'dap'
+      require("flutter-tools").setup {
+        debugger = {
+          enabled = true,
+          register_configurations = function(_)
+                    end,
+        },
+      }
+    end,
   },
   {
     {
@@ -21,6 +30,7 @@ return {
       opts = {
         ensure_installed = {
           "gopls",
+          "dart-debug-adapter"
         },
       },
     },
@@ -33,22 +43,43 @@ return {
   },
   {
     "mfussenegger/nvim-dap",
-      dependencies = {
-    -- Creates a beautiful debugger UI
-    'rcarriga/nvim-dap-ui',
+    dependencies = {
+      -- Creates a beautiful debugger UI
+      'rcarriga/nvim-dap-ui',
 
-    -- Required dependency for nvim-dap-ui
-    'nvim-neotest/nvim-nio',
+      -- Required dependency for nvim-dap-ui
+      'nvim-neotest/nvim-nio',
 
-    -- Installs the debug adapters for you
-    'williamboman/mason.nvim',
-    'jay-babu/mason-nvim-dap.nvim',
+      -- Installs the debug adapters for you
+      'williamboman/mason.nvim',
+      'jay-babu/mason-nvim-dap.nvim',
 
-  },
+    },
 
     config = function()
       local dap = require 'dap'
       local dapui = require 'dapui'
+  dap.adapters.dart = {
+              type = "executable",
+              command = "dart",
+              -- This command was introduced upstream in https://github.com/dart-lang/sdk/commit/b68ccc9a
+              args = {"debug_adapter"}
+            }
+
+            dap.configurations.dart = {
+              {
+                type = "dart",
+                request = "launch",
+                name = "launch flutter",
+                --dartsdkpath = '/users/herculepoirot/flutter/bin/cache/dart-sdk/',
+                --fluttersdkpath = "/users/herculepoirot/flutter",
+                program = "${workspacefolder}/lib/main_dev.dart",
+                cwd = "${workspacefolder}",
+                device = "chrome",
+                toolArgs = {"-d","chrome"}
+              }
+            }
+            require("dap.ext.vscode").load_launchjs()
 
       require('mason-nvim-dap').setup {
         -- Makes a best effort to setup the various debuggers with
@@ -106,7 +137,8 @@ return {
       dap.listeners.after.event_initialized['dapui_config'] = dapui.open
       dap.listeners.before.event_terminated['dapui_config'] = dapui.close
       dap.listeners.before.event_exited['dapui_config'] = dapui.close
-    end
+
+    end,
   },
 
   {
